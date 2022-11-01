@@ -8,7 +8,7 @@ import (
 	"log"
 
 	"github.com/tetratelabs/wazero"
-	"github.com/tetratelabs/wazero/wasi_snapshot_preview1"
+	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 )
 
 //go:embed hello-world-rs.wasm
@@ -25,8 +25,7 @@ func main() {
 }
 
 func compileAndRun(ctx context.Context, name string, wasm []byte) {
-	runtimeConfig := wazero.NewRuntimeConfig().WithWasmCore2()
-	runtime := wazero.NewRuntimeWithConfig(ctx, runtimeConfig)
+	runtime := wazero.NewRuntime(ctx)
 	defer runtime.Close(ctx)
 
 	if _, err := wasi_snapshot_preview1.Instantiate(ctx, runtime); err != nil {
@@ -34,7 +33,7 @@ func compileAndRun(ctx context.Context, name string, wasm []byte) {
 	}
 
 	fmt.Printf("Compilation of %s... ", name)
-	compiled, err := runtime.CompileModule(ctx, wasm, wazero.NewCompileConfig())
+	compiled, err := runtime.CompileModule(ctx, wasm)
 	if err != nil {
 		log.Panicln(err)
 	}
